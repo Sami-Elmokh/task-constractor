@@ -37,6 +37,14 @@ def test_turning_points_difficult_case():
     assert np.allclose(actual, expected, rtol=RTOL, atol=ATOL)
 
 
+def test_turning_points_asymmetric_well_case():
+    # additional regime: tilted potential -cos x + 0.2 x, the well is not symmetric about its bottom
+    test_input = (lambda x: -np.cos(x) + 0.2 * x, lambda x: np.sin(x) + 0.2, 0.3, -np.arcsin(0.2))
+    expected = [-2.497138225795214, 1.5589967108207259]
+    actual = turning_points(*test_input)
+    assert np.allclose(actual, expected, rtol=RTOL, atol=ATOL)
+
+
 def test_barrier_energy_normal_case():
     test_input = (lambda x: -np.cos(x), lambda x: np.sin(x), 0.0)
     expected = [-np.pi, np.pi, 1.0]
@@ -81,6 +89,15 @@ def test_oscillation_period_difficult_case():
     # pendulum 1e-6 below the separatrix: T = 4 K(1 - 5e-7)
     test_input = (lambda x: -np.cos(x), lambda x: np.sin(x), 1 - 1e-6, 0.0)
     expected = 34.56249674156111
+    actual = oscillation_period(*test_input)
+    assert np.allclose(actual, expected, rtol=RTOL, atol=ATOL)
+
+
+def test_oscillation_period_multiwell_case():
+    # additional regime: orbit of the trapped lattice 0.01 x^4 - cos 2x at h = 1.5 that passes over
+    # the two inner barriers (height 1.064) and spans three wells
+    test_input = (lambda x: 0.01 * x**4 - np.cos(2 * x), lambda x: 0.04 * x**3 + 2 * np.sin(2 * x), 1.5, 0.0)
+    expected = 10.953799670554856
     actual = oscillation_period(*test_input)
     assert np.allclose(actual, expected, rtol=RTOL, atol=ATOL)
 

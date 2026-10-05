@@ -13,7 +13,7 @@
 - **Agreement with references.**
   - Maximum relative difference: $7 \times 10^{-10}$, just below escape.
   - Non-extreme tests: at most $4 \times 10^{-14}$.
-- **Error injection.** Nine realistic errors were injected into a copy of the solution, and the tests caught every one:
+- **Deliberate-error check.** In a copy of the task, one realistic mistake at a time was introduced into `solution.py` and the tests were run. Each of these nine mistakes made at least one test fail:
   1. fixed-step march without a narrow-barrier check;
   2. stopping at the first barrier even when $h$ is above it;
   3. a symmetric-well assumption;
@@ -31,7 +31,7 @@ An independent script that never calls `solution.py`.
 - **Turning points.**
   - Harmonic: closed form $\pm\sqrt{h/2}$.
   - Pendulum: closed form $\pm\arccos(-h)$.
-  - Trapped lattice: a dense grid (spacing $10^{-5}$) plus bisection, confirmed by an ODE trajectory started at rest at $a$ that reaches $b$ within $2 \times 10^{-14}$.
+  - Trapped lattice (orbit over three wells) and tilted potential (asymmetric well): a dense grid (spacing $10^{-5}$) plus bisection, confirmed by an ODE trajectory started at rest at $a$ that reaches $b$ within $3 \times 10^{-14}$.
 - **Barriers.**
   - Exact values $[-\pi,\ \pi,\ 1]$ and $[-1,\ 1,\ 1/4]$.
   - Tilted potential: $[-\pi + \arcsin 0.2,\ \pi + \arcsin 0.2]$, with heights $0.3917$ and $1.6484$.
@@ -39,7 +39,7 @@ An independent script that never calls `solution.py`.
   - $2x^2$: $T = \pi$.
   - Pendulum: $T = 4K(m)$ with $m = (1+h)/2$, using `scipy.special.ellipk`.
   - Quartic well: $T = 4K(m)/\sqrt{1 - A^2/2}$ with $m = \dfrac{A^2/2}{1 - A^2/2}$, cross-checked against ODE integration to $6 \times 10^{-15}$.
-  - Tilted potential (no closed form): direct integration of $x'' = -f'(x)$ with `scipy.integrate.solve_ivp` (DOP853, `rtol = 1e-13`, `atol = 1e-14`). On the pendulum, this method agrees with $4K(m)$ to $4 \times 10^{-9}$ at $10^{-6}$ below the separatrix.
+  - Tilted potential and three-well orbit of the trapped lattice (no closed form): direct integration of $x'' = -f'(x)$ with `scipy.integrate.solve_ivp` (DOP853, `rtol = 1e-13`, `atol = 1e-14`). On the pendulum, this method agrees with $4K(m)$ to $4 \times 10^{-9}$ at $10^{-6}$ below the separatrix.
 
 **Numerical tolerances chosen because:**
 

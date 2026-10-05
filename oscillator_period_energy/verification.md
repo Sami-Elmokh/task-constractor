@@ -1,6 +1,58 @@
 # Verification
+**Scientific method checked using:**
 
-- Scientific method checked using: energy conservation, which gives $T = 2\int_a^b du/\sqrt{2(h - f(u))}$. The substitution $u = \text{end} - L s^2$ removes the $1/\sqrt{\cdot}$ singularity at each turning point, Simpson's rule on $f'$ evaluates $h - f(u)$ near the turning points without cancellation, and geometric breakpoints resolve the logarithmic peak near a separatrix. The turning-point search detects barriers narrower than its step through a sign change of $f'$; without this check, the pendulum barrier at $h = 1 - 10^{-6}$ (only $2.8 \times 10^{-3}$ wide) is stepped over and the period comes out as 241 instead of 34.56. The maximum relative difference between the solution and the references is $7 \times 10^{-10}$ (just below escape), and at most $4 \times 10^{-14}$ in the non-extreme tests. Nine realistic errors were injected into a copy of the solution, and each was caught: fixed-step march without a narrow-barrier check, stopping at the first barrier even when $h$ is above it, a symmetric-well assumption, symmetric barriers, $\max$ instead of $\min$ for $h^*$ (the barrier test fails and the curve test does not terminate because the orbit escapes), half period, the small-oscillation formula, a midpoint rule ignoring the endpoint singularities, and energy fractions measured from 0 instead of $f(x_0)$.
-- Expected answers checked using: an independent script that never calls `solution.py`. Turning points: closed forms $\pm\sqrt{h/2}$ (harmonic) and $\pm\arccos(-h)$ (pendulum); for the trapped lattice, a dense grid (spacing $10^{-5}$) plus bisection, confirmed by an ODE trajectory started at rest at $a$ that reaches $b$ within $2 \times 10^{-14}$. Barriers: exact values $[-\pi, \pi, 1]$, $[-1, 1, 1/4]$, and $[-\pi + \arcsin 0.2,\ \pi + \arcsin 0.2]$ with heights 0.3917 and 1.6484 for the tilted potential. Periods: $T = \pi$ for $2x^2$; $T = 4K(m)$ with $m = (1+h)/2$ for the pendulum (`scipy.special.ellipk`); $T = 4K(m)/\sqrt{1 - A^2/2}$ with $m = (A^2/2)/(1 - A^2/2)$ for the quartic well, cross-checked against ODE integration to $6 \times 10^{-15}$; and, for the tilted potential (no closed form), direct integration of $x'' = -f'(x)$ (scipy `solve_ivp`, DOP853, `rtol = 1e-13`, `atol = 1e-14`), which agrees with $4K(m)$ on the pendulum to $4 \times 10^{-9}$ at $10^{-6}$ below the separatrix.
-- Numerical tolerances chosen because: turning points and barriers are exact to about $10^{-13}$, and periods are exact or accurate to about $10^{-9}$ near escape. `RTOL = 1e-7` and `ATOL = 1e-9` leave a margin of 100 over the least accurate reference and are 10 times looser than the accuracy required in `problem.md`, while every modelling error changes the result by at least $10^{-3}$. One test is deliberately numerically sensitive: a plain `scipy.integrate.quad` of $1/\sqrt{2(h - f(u))}$ in $u$ passes every other test, but returns 6.2831881 instead of 6.2831853 for the tiny pendulum oscillation $h - f(x_0) = 10^{-8}$, because $h - f(u)$ then loses about 8 significant digits. `problem.md` states this regime and the need to avoid cancellation explicitly.
-- Important assumptions: the turning points are simple ($f'(a), f'(b) \neq 0$), so every orbit tested is a closed periodic orbit and not a separatrix. All equilibria are non-degenerate ($f'' \neq 0$), and stability requires $f''(x_0) > 0$ strictly. Both barriers of the well exist, and $q \in (0, 1)$, so the orbit never reaches the escape energy. `f` and `fp` are evaluated on scalar floats only.
+- **Approach.** Energy conservation gives the period as
+
+  $$T = 2\int_a^b \frac{du}{\sqrt{2\,(h - f(u))}}.$$
+
+- **Numerical treatment.**
+  - The substitution $u = \text{end} - L s^2$ removes the $1/\sqrt{\cdot}$ singularity at each turning point.
+  - Simpson's rule on $f'$ evaluates $h - f(u)$ near the turning points without cancellation.
+  - Geometric breakpoints resolve the logarithmic peak near a separatrix.
+- **Narrow barriers.** The turning-point search detects barriers narrower than its step through a sign change of $f'$. Without this check, the pendulum barrier at $h = 1 - 10^{-6}$ (only $2.8 \times 10^{-3}$ wide) is stepped over, and the period comes out as $241$ instead of $34.56$.
+- **Agreement with references.**
+  - Maximum relative difference: $7 \times 10^{-10}$, just below escape.
+  - Non-extreme tests: at most $4 \times 10^{-14}$.
+- **Error injection.** Nine realistic errors were injected into a copy of the solution, and the tests caught every one:
+  1. fixed-step march without a narrow-barrier check;
+  2. stopping at the first barrier even when $h$ is above it;
+  3. a symmetric-well assumption;
+  4. symmetric barriers;
+  5. $\max$ instead of $\min$ for $h^*$ (the barrier test fails, and the curve test does not terminate because the orbit escapes);
+  6. half period;
+  7. the small-oscillation formula;
+  8. a midpoint rule ignoring the endpoint singularities;
+  9. energy fractions measured from $0$ instead of $f(x_0)$.
+
+**Expected answers checked using:**
+
+An independent script that never calls `solution.py`.
+
+- **Turning points.**
+  - Harmonic: closed form $\pm\sqrt{h/2}$.
+  - Pendulum: closed form $\pm\arccos(-h)$.
+  - Trapped lattice: a dense grid (spacing $10^{-5}$) plus bisection, confirmed by an ODE trajectory started at rest at $a$ that reaches $b$ within $2 \times 10^{-14}$.
+- **Barriers.**
+  - Exact values $[-\pi,\ \pi,\ 1]$ and $[-1,\ 1,\ 1/4]$.
+  - Tilted potential: $[-\pi + \arcsin 0.2,\ \pi + \arcsin 0.2]$, with heights $0.3917$ and $1.6484$.
+- **Periods.**
+  - $2x^2$: $T = \pi$.
+  - Pendulum: $T = 4K(m)$ with $m = (1+h)/2$, using `scipy.special.ellipk`.
+  - Quartic well: $T = 4K(m)/\sqrt{1 - A^2/2}$ with $m = \dfrac{A^2/2}{1 - A^2/2}$, cross-checked against ODE integration to $6 \times 10^{-15}$.
+  - Tilted potential (no closed form): direct integration of $x'' = -f'(x)$ with `scipy.integrate.solve_ivp` (DOP853, `rtol = 1e-13`, `atol = 1e-14`). On the pendulum, this method agrees with $4K(m)$ to $4 \times 10^{-9}$ at $10^{-6}$ below the separatrix.
+
+**Numerical tolerances chosen because:**
+
+- **Reference accuracy.** Turning points and barriers are exact to about $10^{-13}$. Periods are exact, or accurate to about $10^{-9}$ near escape.
+- **Chosen values.** `RTOL = 1e-7` and `ATOL = 1e-9`. These:
+  - leave a margin of 100 over the least accurate reference;
+  - are 10 times looser than the accuracy required in `problem.md`;
+  - are far tighter than any modelling error, each of which changes the result by at least $10^{-3}$.
+- **Deliberately sensitive test.** A plain `scipy.integrate.quad` of $1/\sqrt{2(h - f(u))}$ in $u$ passes every other test. For the tiny pendulum oscillation $h - f(x_0) = 10^{-8}$, however, it returns $6.2831881$ instead of $6.2831853$, because $h - f(u)$ loses about 8 significant digits. `problem.md` states this regime and the need to avoid cancellation explicitly.
+
+**Important assumptions:**
+
+- **Simple turning points.** $f'(a) \neq 0$ and $f'(b) \neq 0$, so every orbit tested is a closed periodic orbit, not a separatrix.
+- **Non-degenerate equilibria.** $f'' \neq 0$ at all equilibria, and stability requires $f''(x_0) > 0$ strictly.
+- **Bounded orbit.** Both barriers of the well exist, and $q \in (0, 1)$, so the orbit never reaches the escape energy.
+- **Scalar evaluation.** `f` and `fp` are evaluated on scalar floats only.

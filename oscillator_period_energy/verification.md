@@ -48,7 +48,7 @@ An independent script that never calls `solution.py`.
   - leave a margin of 100 over the least accurate reference;
   - are 10 times looser than the accuracy required in `problem.md`;
   - are far tighter than any modelling error, each of which changes the result by at least $10^{-3}$.
-- **Deliberately sensitive test.** A plain `scipy.integrate.quad` of $1/\sqrt{2(h - f(u))}$ in $u$ passes every other test. For the tiny pendulum oscillation $h - f(x_0) = 10^{-8}$, however, it returns $6.2831881$ instead of $6.2831853$, because $h - f(u)$ loses about 8 significant digits. `problem.md` states this regime and the need to avoid cancellation explicitly.
+- **Deliberately sensitive test.** A plain `scipy.integrate.quad` of $1/\sqrt{2(h - f(u))}$ in $u$ passes every other test. For the tiny pendulum oscillation $h - f(x_0) = 10^{-8}$, however, it returns $6.2831881$ instead of $6.2831853$, because $h - f(u)$ loses about 8 significant digits. `problem.md` states this regime ($h - f(x_0)$ as small as $10^{-8}$) and the required accuracy $10^{-8}$ explicitly, so the failure reflects a numerical-stability error, not an unstated requirement.
 
 **Important assumptions:**
 

@@ -1,27 +1,26 @@
-"""Period of a conservative one-dimensional oscillator, from small oscillations up to escape."""
+"""Complete working code for the task."""
 
 import numpy as np
 from scipy.integrate import quad
 from scipy.optimize import brentq
 
-_DX = 1e-2                       # marching step for searches along the x axis
-_EPS = np.finfo(float).eps
-
 
 def turning_points(f, fp, h, x0):
     """Ends [a, b] of the maximal open interval containing x0 on which f < h."""
+    dx = 1e-2  # marching step
+    eps = np.finfo(float).eps
 
     def edge(sign):
         x = x0
         while True:
-            y = x + sign * _DX
+            y = x + sign * dx
             if f(y) >= h:
-                return brentq(lambda u: f(u) - h, x, y, xtol=1e-15, rtol=4 * _EPS)
+                return brentq(lambda u: f(u) - h, x, y, xtol=1e-15, rtol=4 * eps)
             # a barrier narrower than the step can hide between x and y: look for a maximum of f
             if sign * fp(x) > 0 and sign * fp(y) < 0:
-                xm = brentq(fp, x, y, xtol=1e-15, rtol=4 * _EPS)
+                xm = brentq(fp, x, y, xtol=1e-15, rtol=4 * eps)
                 if f(xm) >= h:
-                    return brentq(lambda u: f(u) - h, x, xm, xtol=1e-15, rtol=4 * _EPS)
+                    return brentq(lambda u: f(u) - h, x, xm, xtol=1e-15, rtol=4 * eps)
             x = y
 
     return np.array([edge(-1), edge(1)])
@@ -29,13 +28,15 @@ def turning_points(f, fp, h, x0):
 
 def barrier_energy(f, fp, x0):
     """Nearest maxima e_left < x0 < e_right of f around the minimum x0, and h* = min(f(e_left), f(e_right))."""
+    dx = 1e-2  # marching step
+    eps = np.finfo(float).eps
 
     def nearest_max(sign):
-        x = x0 + sign * _DX
+        x = x0 + sign * dx
         while True:
-            y = x + sign * _DX
+            y = x + sign * dx
             if sign * fp(y) <= 0:
-                return brentq(fp, x, y, xtol=1e-15, rtol=4 * _EPS)
+                return brentq(fp, x, y, xtol=1e-15, rtol=4 * eps)
             x = y
 
     e_left, e_right = nearest_max(-1), nearest_max(1)
@@ -71,7 +72,7 @@ def oscillation_period(f, fp, h, x0):
 
 
 def period_energy_curve(f, fp, x0, q):
-    """Periods at energies h = f(x0) + q (h* - f(x0)) across the well whose bottom is x0."""
+    """Use the subproblem functions to produce the periods at h = f(x0) + q (h* - f(x0)) across the well."""
     h_star = barrier_energy(f, fp, x0)[2]
     f0 = f(x0)
     return np.array([oscillation_period(f, fp, f0 + qi * (h_star - f0), x0) for qi in np.atleast_1d(q)])

@@ -1,11 +1,6 @@
-"""Response of an undamped oscillator to a sampled periodic force, including resonance."""
+"""Complete working code for the task."""
 
 import numpy as np
-
-
-def _wave_numbers(N):
-    """Integer wave numbers in numpy FFT order (0, 1, ..., M, -M, ..., -1) for odd N."""
-    return np.fft.ifftshift(np.arange(-(N // 2), N // 2 + 1))
 
 
 def resonant_modes(mu):
@@ -27,7 +22,9 @@ def periodic_particular_solution(mu, t):
     t = np.atleast_1d(np.asarray(t, dtype=float))
     N = mu.size
     c = np.fft.fft(mu) / N
-    k = _wave_numbers(N)
+    # integer wave numbers in FFT order (0, 1, ..., M, -M, ..., -1); np.fft.fftfreq returns
+    # floats that are not always exactly 1 for the first harmonic
+    k = np.fft.ifftshift(np.arange(-(N // 2), N // 2 + 1))
     nonres = np.abs(k) != 1
     y_hat = np.zeros_like(c)
     y_hat[nonres] = c[nonres] / (1.0 - k[nonres] ** 2)
@@ -38,7 +35,7 @@ def periodic_particular_solution(mu, t):
 
 
 def driven_response(mu, t):
-    """Exact solution of y'' + y = mu, y(0) = y'(0) = 0, at the times t (resonant or not)."""
+    """Use the subproblem functions to produce the exact solution of y'' + y = mu, y(0) = y'(0) = 0."""
     t = np.atleast_1d(np.asarray(t, dtype=float))
     a1, b1 = resonant_modes(mu)
     y_p, _ = periodic_particular_solution(mu, t)

@@ -18,7 +18,7 @@ Each task folder contains:
 | `requirements.txt` | Libraries used |
 | `verification.md` | How the science and expected answers were checked, and why the tolerances were chosen |
 
-The step-by-step history of the changes, and the reasons behind them, is in [HISTORIQUE.md](HISTORIQUE.md) (in French).
+Where ChatGPT fails on each task: [HISTORIQUE.md](HISTORIQUE.md) (in French).
 
 ## Running a task
 

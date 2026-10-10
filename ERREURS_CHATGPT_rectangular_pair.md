@@ -13,14 +13,14 @@ ChatGPT n'a reçu que `problem.md`. Son code échoue à **8 des 14 tests**, pour
 
 **Rappel.** Une chaîne de longueur $L$ est une suite de vecteurs $e_0 \to e_1 \to \dots \to e_{L-1} \to 0$ qui **alternent** entre $\mathbb{C}^m$ et $\mathbb{C}^n$ : on passe d'un côté à l'autre par $A$, puis on revient par $B$.
 
-**Ce que fait ChatGPT.** Il traite chaque côté séparément. Pour le côté $m$, il prend les chutes de rang $d_k = \operatorname{rank} W^m_k - \operatorname{rank} W^m_{k+1}$ et pose « nombre de chaînes de longueur $L$ partant de $m$ $= d_{L-1} - d_L$ ». Il fait de même pour le côté $n$. C'est la formule du cas d'**une seule** matrice nilpotente, comme les blocs de Jordan de la question 10, mais elle ne s'applique pas ici.
+**Ce que fait ChatGPT.** Il traite chaque côté séparément. Pour le côté $m$, il prend les chutes de rang $d_k = \mathrm{rank} W^m_k - \mathrm{rank} W^m_{k+1}$ et pose « nombre de chaînes de longueur $L$ partant de $m$ $= d_{L-1} - d_L$ ». Il fait de même pour le côté $n$. C'est la formule du cas d'**une seule** matrice nilpotente, comme les blocs de Jordan de la question 10, mais elle ne s'applique pas ici.
 
 **Contre-exemple minimal : une seule chaîne de longueur 3 partant de $m$.** On a $e_0 \in \mathbb{C}^m$, $e_1 = Ae_0 \in \mathbb{C}^n$, $e_2 = Be_1 \in \mathbb{C}^m$, puis $Ae_2 = 0$.
 
 | $k$ | 0 | 1 | 2 | 3 |
 |---|---|---|---|---|
-| $\operatorname{rank} W^m_k$ ($I$, $A$, $BA$, $ABA$) | 2 | 1 | 1 | 0 |
-| $\operatorname{rank} W^n_k$ ($I$, $B$, $AB$, $BAB$) | 1 | 1 | 0 | 0 |
+| $\mathrm{rank} W^m_k$ ($I$, $A$, $BA$, $ABA$) | 2 | 1 | 1 | 0 |
+| $\mathrm{rank} W^n_k$ ($I$, $B$, $AB$, $BAB$) | 1 | 1 | 0 | 0 |
 | **total** | **3** | **2** | **1** | **0** |
 
 - La suite d'**un seul côté** oscille (2, 1, 1, 0), parce que les vecteurs de la chaîne changent de côté à chaque pas. Les différences de ses chutes ne comptent donc rien de sensé. ChatGPT trouve `{(1,'m'): 1, (2,'n'): 1}`, c'est-à-dire deux chaînes qui n'existent pas, au lieu de `{(3,'m'): 1}`.

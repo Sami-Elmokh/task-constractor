@@ -1,14 +1,14 @@
 # Verification
 
-- Scientific method checked using: the classification of pairs $(A, B)$ under simultaneous equivalence. With $M = \begin{pmatrix} 0 & B \\ A & 0 \end{pmatrix}$ and $H = \operatorname{diag}(I_m, -I_n)$, simultaneous equivalence of pairs is simultaneous similarity of $(M, H)$. $\mathbb{C}^{m+n}$ splits into $\ker M^r \oplus \ker Q(M)$, both stable under $H$. The graded Jordan decomposition of the nilpotent part gives the chains, and the Jordan decomposition of $BA$ on the invertible part gives the blocks $(\lambda, r)$.
-  - The solution reads the decomposition from exact ranks. A chain of length $L$ adds $\max(L-k, 0)$ to $\operatorname{rank} W^m_k + \operatorname{rank} W^n_k$, and an invertible block adds a constant. Second differences of the total rank give the number of chains of each length. The alternating sum $\operatorname{rank} W^m_k - \operatorname{rank} W^n_k$, in which the invertible blocks cancel, separates the two starting sides. The Jordan sizes for each $\lambda$ come from second differences of $\operatorname{rank}(BA - \lambda I)^k$.
+- Scientific method checked using: the classification of pairs $(A, B)$ under simultaneous equivalence. With $M = \begin{pmatrix} 0 & B \\ A & 0 \end{pmatrix}$ and $H = \mathrm{diag}(I_m, -I_n)$, simultaneous equivalence of pairs is simultaneous similarity of $(M, H)$. $\mathbb{C}^{m+n}$ splits into $\ker M^r \oplus \ker Q(M)$, both stable under $H$. The graded Jordan decomposition of the nilpotent part gives the chains, and the Jordan decomposition of $BA$ on the invertible part gives the blocks $(\lambda, r)$.
+  - The solution reads the decomposition from exact ranks. A chain of length $L$ adds $\max(L-k, 0)$ to $\mathrm{rank} W^m_k + \mathrm{rank} W^n_k$, and an invertible block adds a constant. Second differences of the total rank give the number of chains of each length. The alternating sum $\mathrm{rank} W^m_k - \mathrm{rank} W^n_k$, in which the invertible blocks cancel, separates the two starting sides. The Jordan sizes for each $\lambda$ come from second differences of $\mathrm{rank}(BA - \lambda I)^k$.
   - All ranks are computed exactly, by Gaussian elimination over $\mathbb{Q}$ with Python integers and `fractions.Fraction`.
   - Deliberate-error check: in a copy of the task, one realistic mistake at a time was introduced into `solution.py` and the tests were run. Each of these nine mistakes made at least one test fail:
     - ranks computed in floating point (`numpy.linalg.matrix_rank`), 4 tests;
     - products in `int64` then a float rank, 1 test;
     - starting sides swapped, 6 tests;
     - chain lengths from first differences, 5 tests;
-    - sides from $\operatorname{rank} W^m_k - \operatorname{rank} W^n_k$ without the alternation correction, 4 tests;
+    - sides from $\mathrm{rank} W^m_k - \mathrm{rank} W^n_k$ without the alternation correction, 4 tests;
     - Jordan sizes from first differences, 3 tests;
     - chains ordered by increasing length, 2 tests;
     - Jordan shift placed above the diagonal, 1 test;

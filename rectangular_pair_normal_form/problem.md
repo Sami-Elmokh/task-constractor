@@ -45,7 +45,7 @@ Each block occupies the next consecutive coordinates of $\mathbb{C}^m$ and of $\
 ### `alternating_ranks(A, B, K)`
 
 - Input: `A`, `B`, `numpy` arrays of `dtype=object` holding Python integers, of shapes `(n, m)` and `(m, n)`; `K`, integer $\ge 0$.
-- Output: `numpy` integer array of shape `(2, K + 1)`. Entry `[0, k]` is $\operatorname{rank} W^m_k$ and entry `[1, k]` is $\operatorname{rank} W^n_k$.
+- Output: `numpy` integer array of shape `(2, K + 1)`. Entry `[0, k]` is $\mathrm{rank} W^m_k$ and entry `[1, k]` is $\mathrm{rank} W^n_k$.
 - Purpose: Rank profile of the alternating products.
 
 ### `chain_counts(A, B)`

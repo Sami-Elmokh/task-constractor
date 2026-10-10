@@ -24,6 +24,13 @@
   8. a midpoint rule ignoring the endpoint singularities;
   9. energy fractions measured from $0$ instead of $f(x_0)$.
 
+**Frontier-model check:**
+
+- ChatGPT, given only `problem.md`, returned a solution that fails 5 of the 14 tests:
+  - its turning-point search uses a geometrically growing step that jumps over the pendulum barrier at $h = 1 - 10^{-6}$, so the orbit crosses an unstable equilibrium: turning points $\pm 2.3 \times 10^{17}$ instead of $\pm 3.1402$, and a period of $1.3 \times 10^{18}$ instead of $34.56$;
+  - the same search jumps over the left barrier of the tilted potential near escape and raises an error;
+  - it evaluates $h - f(u)$ directly, which loses accuracy for tiny oscillations: $T = 6.28289$ instead of $6.28319$ at $h - f(x_0) = 10^{-8}$ (relative error $5 \times 10^{-5}$), and a relative error of $10^{-6}$ on the period–energy curve at $q = 10^{-8}$.
+
 **Expected answers checked using:**
 
 An independent script that never calls `solution.py`.

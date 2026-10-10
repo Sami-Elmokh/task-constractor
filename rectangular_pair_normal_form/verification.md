@@ -1,0 +1,24 @@
+# Verification
+
+- Scientific method checked using: the classification of pairs $(A, B)$ under simultaneous equivalence. With $M = \begin{pmatrix} 0 & B \\ A & 0 \end{pmatrix}$ and $H = \operatorname{diag}(I_m, -I_n)$, simultaneous equivalence of pairs is simultaneous similarity of $(M, H)$. $\mathbb{C}^{m+n}$ splits into $\ker M^r \oplus \ker Q(M)$, both stable under $H$. The graded Jordan decomposition of the nilpotent part gives the chains, and the Jordan decomposition of $BA$ on the invertible part gives the blocks $(\lambda, r)$.
+  - The solution reads the decomposition from exact ranks. A chain of length $L$ adds $\max(L-k, 0)$ to $\operatorname{rank} W^m_k + \operatorname{rank} W^n_k$, and an invertible block adds a constant. Second differences of the total rank give the number of chains of each length. The alternating sum $\operatorname{rank} W^m_k - \operatorname{rank} W^n_k$, in which the invertible blocks cancel, separates the two starting sides. The Jordan sizes for each $\lambda$ come from second differences of $\operatorname{rank}(BA - \lambda I)^k$.
+  - All ranks are computed exactly, by Gaussian elimination over $\mathbb{Q}$ with Python integers and `fractions.Fraction`.
+  - Deliberate-error check: in a copy of the task, one realistic mistake at a time was introduced into `solution.py` and the tests were run. Each of these nine mistakes made at least one test fail:
+    - ranks computed in floating point (`numpy.linalg.matrix_rank`), 4 tests;
+    - products in `int64` then a float rank, 1 test;
+    - starting sides swapped, 6 tests;
+    - chain lengths from first differences, 5 tests;
+    - sides from $\operatorname{rank} W^m_k - \operatorname{rank} W^n_k$ without the alternation correction, 4 tests;
+    - Jordan sizes from first differences, 3 tests;
+    - chains ordered by increasing length, 2 tests;
+    - Jordan shift placed above the diagonal, 1 test;
+    - invertible blocks placed after the chains, 2 tests.
+- Frontier-model check: ChatGPT, given only `problem.md`, returned a solution that fails 8 of the 14 tests. It computes the ranks exactly, so the three `alternating_ranks` tests pass. Its chain counts use first differences of the rank drops on each side separately, ignoring the alternation between sides, which gives wrong counts (2 tests). Its `invertible_blocks` sizes $BA$ with $n$ instead of $m$ and raises an `IndexError` whenever $m \neq n$ (3 tests, and the 3 `canonical_form` tests that depend on it).
+- Expected answers checked using: construction. Every test pair is built from a known list of blocks and then scrambled by random unimodular integer matrices $P$, $Q$ (products of elementary operations, fixed seeds), which preserves all invariants. The expected chain counts, invertible blocks and canonical pairs are therefore the blocks themselves, written in canonical order. The expected rank profiles were predicted combinatorially from the blocks. An independent script that never calls `solution.py` confirmed them with exact `sympy` ranks of the scrambled products, and also confirmed the Jordan structure of $BA$ from exact `sympy` ranks of $(BA - \lambda I)^k$. On the scrambled $16 \times 17$ test pair, whose entries reach $1.5 \times 10^8$, ranks computed in floating point are wrong from $k = 3$ onward.
+- Numerical tolerances chosen because: every output is an integer (ranks, counts, eigenvalues, sizes, entries of the canonical matrices). The tests therefore use exact comparisons (`==`, `numpy.array_equal`), with no tolerance.
+- Important assumptions:
+  - The entries are integers given as Python integers (object arrays), so exact rational arithmetic is possible.
+  - The nonzero eigenvalues of $BA$ are integers with $|\lambda| \le 50$.
+  - $1 \le m, n \le 40$.
+  - The canonical order of blocks and of basis vectors is fixed in `problem.md`, so the canonical pair is unique.
+  - The tests cover the zero pair, a purely invertible pair, chains of equal length starting on both sides, a repeated eigenvalue with Jordan blocks of different sizes, and a mixed $16 \times 17$ pair.

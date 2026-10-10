@@ -4,7 +4,7 @@ Original SciCode-style scientific coding tasks. Each task is a folder in the SME
 
 | Task | Domain | Topic |
 |---|---|---|
-| [driven_oscillator_resonance](driven_oscillator_resonance/problem.md) | Physics → Computational Physics | Exact response of an undamped oscillator to a sampled periodic force, including resonance |
+| [driven_oscillator_resonance](driven_oscillator_resonance/problem.md) | Physics → Computational Physics | Response of an undamped oscillator of any natural frequency to a sampled periodic force, at and near resonance |
 | [oscillator_period_energy](oscillator_period_energy/problem.md) | Physics → Computational Physics | Period–energy curve of a 1D potential well, from small oscillations up to escape |
 
 Each task folder contains:

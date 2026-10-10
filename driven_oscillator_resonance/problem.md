@@ -1,60 +1,56 @@
-# Driven oscillator: periodic response and resonance
+# Driven oscillator near resonance
 
 ## Scientific objective
 
-An undamped harmonic oscillator with natural angular frequency $\omega_0 = 1$ starts from rest and is driven by a $2\pi$-periodic force $\mu(t)$:
+An undamped harmonic oscillator with natural angular frequency $\omega > 0$ starts from rest and is driven by a $2\pi$-periodic force $\mu(t)$:
 
-$$y''(t) + y(t) = \mu(t), \qquad y(0) = 0, \qquad y'(0) = 0.$$
+$$y''(t) + \omega^2 y(t) = \mu(t), \qquad y(0) = 0, \qquad y'(0) = 0.$$
 
-The force is known only through $N$ equally spaced samples over one period. Compute the exact motion $y(t)$ at arbitrary times $t \ge 0$. The force may or may not contain a component at the natural frequency, and the required functions must be valid in both cases.
+The force is known only through $N$ equally spaced samples over one period. Compute the motion $y(t)$ for any $\omega > 0$, including $\omega$ equal to, or extremely close to, the frequency of one of the harmonics of the force.
 
 ## Formulas and assumptions
 
-**Samples and interpolant.** The samples are $\mu_j = \mu(t_j)$ with
+**Samples and interpolant.** The samples are $\mu_j = \mu(t_j)$ with $t_j = 2\pi j / N$, $j = 0, \dots, N-1$, $N$ odd, $N \ge 3$. Throughout the task, $\mu$ **is defined to be** the unique trigonometric polynomial of degree $M = (N-1)/2$ that interpolates the samples, written in real form as
 
-$$t_j = \frac{2\pi j}{N}, \qquad j = 0, 1, \dots, N-1, \qquad N \text{ odd}, \; N \ge 3.$$
+$$\mu(t) = a_0 + \sum_{k=1}^{M} \bigl(a_k \cos kt + b_k \sin kt\bigr), \qquad b_0 = 0.$$
 
-Throughout the task, $\mu$ **is defined to be** the unique trigonometric polynomial of degree $M = (N-1)/2$ that interpolates the samples:
+**Mode responses.** For an integer $k \ge 0$, $C_k(t)$ and $S_k(t)$ are the solutions of
 
-$$\mu(t) = \sum_{k=-M}^{M} c_k \, e^{ikt}, \qquad c_k = \frac{1}{N} \sum_{j=0}^{N-1} \mu_j \, e^{-ik t_j}.$$
+$$C_k'' + \omega^2 C_k = \cos kt, \qquad S_k'' + \omega^2 S_k = \sin kt,$$
 
-All outputs are exact for this interpolant; no other approximation of $\mu$ is allowed.
+with $C_k(0) = C_k'(0) = S_k(0) = S_k'(0) = 0$.
 
-**Resonant coefficients.** $a_1$ and $b_1$ are the real coefficients of the $k = \pm 1$ part of the interpolant, written $a_1 \cos t + b_1 \sin t$.
-
-**Periodic particular solution.** With $\tilde\mu(t) = \mu(t) - a_1 \cos t - b_1 \sin t$, $y_p$ is the unique $2\pi$-periodic solution of $y_p'' + y_p = \tilde\mu$ that contains no $\cos t$ or $\sin t$ term.
-
-**Full response.** $y(t)$ is the solution of the initial value problem above with the full interpolant $\mu$. Times up to $t \approx 100$ are required.
+**Requirements.** $\omega$ may be exactly an integer or differ from an integer by as little as $10^{-12}$. Times range over $0 \le t \le 200$. All outputs must have a relative accuracy of $10^{-9}$, or an absolute accuracy of $10^{-11}$ for values close to zero.
 
 | Symbol or notation | Meaning | Units, if any |
 | --- | --- | --- |
-| $t$ | time | dimensionless (natural period $2\pi$) |
-| $N$ | number of samples | — |
-| $\mu_j$ | sampled force at $t_j$ | force per unit mass (dimensionless) |
-| $c_k$ | complex Fourier coefficient of the interpolant | same as $\mu$ |
-| $a_1, b_1$ | coefficients of $\cos t$ and $\sin t$ in the interpolant | same as $\mu$ |
-| $y_p$ | periodic particular solution | displacement (dimensionless) |
-| $y$ | response starting from rest | displacement (dimensionless) |
+| $t$ | time | dimensionless (force period $2\pi$) |
+| $\omega$ | natural angular frequency of the oscillator | 1 / time |
+| $N$, $M$ | number of samples, $M = (N-1)/2$ | — |
+| $\mu_j$ | sampled force per unit mass | dimensionless |
+| $a_k$, $b_k$ | real Fourier coefficients of the interpolant | same as $\mu$ |
+| $C_k$, $S_k$ | responses from rest to $\cos kt$ and $\sin kt$ | displacement |
+| $y$ | response from rest to $\mu$ | displacement |
 
 ## Required functions
 
-### `resonant_modes(mu)`
+### `forcing_coefficients(mu)`
 
 - Input: `mu`, 1D `numpy` array of floats of odd length $N \ge 3$, the samples $\mu_j$.
-- Output: 1D `numpy` array of 2 floats, `[a1, b1]`.
-- Purpose: Extract the component of the force at the natural frequency.
+- Output: `numpy` array of floats of shape `(2, M + 1)`; row 0 is $a_0, \dots, a_M$ and row 1 is $b_0, \dots, b_M$.
+- Purpose: Decompose the force into harmonics.
 
-### `periodic_particular_solution(mu, t)`
+### `mode_response(k, omega, t)`
 
-- Input: `mu` as above; `t`, 1D array-like of floats (times).
-- Output: `numpy` array of floats of shape `(2, len(t))`. Row 0 is $y_p(t)$ and row 1 is $y_p'(t)$.
-- Purpose: Compute the periodic response to the non-resonant part of the force.
+- Input: `k`, integer $\ge 0$; `omega`, float $> 0$; `t`, 1D array-like of floats in $[0, 200]$.
+- Output: `numpy` array of floats of shape `(2, len(t))`; row 0 is $C_k(t)$ and row 1 is $S_k(t)$.
+- Purpose: Response of the oscillator to a single harmonic.
 
-### `driven_response(mu, t)`
+### `driven_response(mu, omega, t)`
 
-- Input: `mu` as above; `t`, 1D array-like of floats (times $t \ge 0$).
+- Input: `mu` as in `forcing_coefficients`; `omega`, float $> 0$; `t` as in `mode_response`.
 - Output: 1D `numpy` array of floats of length `len(t)`, the values $y(t)$.
-- Purpose: Use `resonant_modes` and `periodic_particular_solution` to produce the response from rest.
+- Purpose: Use `forcing_coefficients` and `mode_response` to produce the response to the full force.
 
 ## Allowed libraries
 

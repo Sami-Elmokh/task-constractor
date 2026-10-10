@@ -3,44 +3,47 @@
 import numpy as np
 
 
-def resonant_modes(mu):
-    """Coefficients [a1, b1] of cos t and sin t in the trigonometric interpolant of the samples."""
-    mu = np.asarray(mu, dtype=float)
-    N = mu.size
-    t = 2 * np.pi * np.arange(N) / N
-    a1 = 2.0 / N * np.dot(mu, np.cos(t))
-    b1 = 2.0 / N * np.dot(mu, np.sin(t))
-    return np.array([a1, b1])
+def forcing_coefficients(mu):
+    """Real Fourier coefficients of the trigonometric interpolant of the samples.
 
-
-def periodic_particular_solution(mu, t):
-    """Periodic solution y_p of y'' + y = mu with the k = +-1 modes of mu removed.
-
-    Returns an array of shape (2, len(t)): y_p(t) and y_p'(t).
+    Returns an array of shape (2, M + 1): row 0 is a_0, ..., a_M and row 1 is b_0, ..., b_M,
+    with mu(t) = a_0 + sum_k (a_k cos kt + b_k sin kt) and b_0 = 0.
     """
     mu = np.asarray(mu, dtype=float)
-    t = np.atleast_1d(np.asarray(t, dtype=float))
     N = mu.size
-    c = np.fft.fft(mu) / N
-    # integer wave numbers in FFT order (0, 1, ..., M, -M, ..., -1); np.fft.fftfreq returns
-    # floats that are not always exactly 1 for the first harmonic
-    k = np.fft.ifftshift(np.arange(-(N // 2), N // 2 + 1))
-    nonres = np.abs(k) != 1
-    y_hat = np.zeros_like(c)
-    y_hat[nonres] = c[nonres] / (1.0 - k[nonres] ** 2)
-    phase = np.exp(1j * np.outer(t, k))
-    y_p = np.real(phase @ y_hat)
-    dy_p = np.real(phase @ (1j * k * y_hat))
-    return np.array([y_p, dy_p])
+    M = (N - 1) // 2
+    c = np.fft.rfft(mu)[: M + 1] / N          # c_k for k = 0..M
+    a = 2 * c.real
+    b = -2 * c.imag
+    a[0] = c[0].real
+    b[0] = 0.0
+    return np.array([a, b])
 
 
-def driven_response(mu, t):
-    """Use the subproblem functions to produce the exact solution of y'' + y = mu, y(0) = y'(0) = 0."""
+def mode_response(k, omega, t):
+    """Responses from rest of y'' + omega^2 y = cos(kt) and = sin(kt), shape (2, len(t)).
+
+    Written so that no division by omega - k occurs: exact at resonance and free of
+    cancellation when omega is arbitrarily close to k.
+    """
     t = np.atleast_1d(np.asarray(t, dtype=float))
-    a1, b1 = resonant_modes(mu)
-    y_p, _ = periodic_particular_solution(mu, t)
-    y0, dy0 = periodic_particular_solution(mu, [0.0])[:, 0]
-    # secular response to the resonant forcing a1 cos t + b1 sin t; its slope at t = 0 is -b1/2
-    y_s = 0.5 * t * (a1 * np.sin(t) - b1 * np.cos(t))
-    # free oscillation that enforces y(0) = 0 and y'(0) = 0
-    return y_p + y_s - y0 * np.cos(t) - (dy0 - 0.5 * b1) * np.sin(t)
+    d = omega - k
+    s = omega + k
+    # sin(d t / 2) / (d / 2) = t * sinc(d t / (2 pi)), smooth through d = 0
+    half_sin_ratio = t * np.sinc(d * t / (2 * np.pi))
+    # (cos kt - cos wt) / (w^2 - k^2) = 2 sin(s t/2) sin(d t/2) / (s d)
+    y_cos = np.sin(s * t / 2) * half_sin_ratio / s
+    # (sin kt - (k/w) sin wt) / (w^2 - k^2) = (-2 cos(s t/2) sin(d t/2) / d + sin(wt)/w) / s
+    y_sin = (-np.cos(s * t / 2) * half_sin_ratio + np.sin(omega * t) / omega) / s
+    return np.array([y_cos, y_sin])
+
+
+def driven_response(mu, omega, t):
+    """Use the subproblem functions to produce the response from rest of y'' + omega^2 y = mu."""
+    t = np.atleast_1d(np.asarray(t, dtype=float))
+    a, b = forcing_coefficients(mu)
+    y = np.zeros_like(t)
+    for k in range(a.size):
+        y_cos, y_sin = mode_response(k, omega, t)
+        y += a[k] * y_cos + b[k] * y_sin
+    return y

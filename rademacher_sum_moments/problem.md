@@ -14,7 +14,7 @@ $$\alpha_p \lVert S\rVert_2 \le \lVert S\rVert_p \le \beta_p \lVert S\rVert_2, \
 
 **Coefficients.** The $c_i$ are integers of any sign; some may be zero, and values may repeat.
 
-**Law.** $P(S = s) = 2^{-n}\,\#\{(\varepsilon_1, \dots, \varepsilon_n) \in \{-1, 1\}^n : \sum_i c_i \varepsilon_i = s\}$.
+**Law.** $P(S = s) = 2^{-n} N(s)$, where $N(s)$ is the number of sign vectors $(\varepsilon_1, \dots, \varepsilon_n) \in \{-1, 1\}^n$ such that $\sum_i c_i \varepsilon_i = s$.
 
 **Tail.** $P(\lvert S\rvert > t)$, with a strict inequality, for any rational $t$.
 

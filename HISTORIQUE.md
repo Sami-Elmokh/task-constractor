@@ -37,12 +37,4 @@ La précision demandée est $10^{-8}$, y compris pour $h$ à $10^{-6}$ du sommet
 | **Formule des chaînes fausse** : il lit le nombre de chaînes de chaque côté dans les différences premières des chutes de rang de ce côté, sans tenir compte de l'alternance entre les deux côtés. | 2 |
 | **Confusion entre $m$ et $n$** : $BA$ est de taille $m\times m$, mais il utilise $n$. Le code plante dès que $m \neq n$. | 6 (blocs inversibles et forme canonique) |
 
-## 4. `sinkhorn_limit` : ChatGPT échoue à 1/10
-
-**Le problème.** Une matrice positive $A$ est ramenée dans le polytope de Birkhoff par l'itération de Sinkhorn (normaliser alternativement les lignes et les colonnes). Il faut calculer la limite à $10^{-10}$ près, y compris quand certains coefficients ne sont sur aucune diagonale positive, ou quand la matrice est presque décomposable.
-
-| Erreur de ChatGPT | Tests échoués |
-|---|---|
-| **Itère Sinkhorn**, même en variables logarithmiques. Sur une matrice presque décomposable (couplages de $10^{-6}$), il ne converge pas en 210 000 itérations et lève une erreur. Sans cette erreur, son résultat est faux de $5{,}6\times10^{-7}$, soit 5 600 fois la précision demandée. | 1 |
-
 Toutes ces erreurs portent sur des régimes **écrits dans `problem.md`**. Les échecs viennent donc de vraies erreurs, pas d'une ambiguïté de l'énoncé.

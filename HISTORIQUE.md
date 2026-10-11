@@ -37,4 +37,13 @@ La précision demandée est $10^{-8}$, y compris pour $h$ à $10^{-6}$ du sommet
 | **Formule des chaînes fausse** : il lit le nombre de chaînes de chaque côté dans les différences premières des chutes de rang de ce côté, sans tenir compte de l'alternance entre les deux côtés. | 2 |
 | **Confusion entre $m$ et $n$** : $BA$ est de taille $m\times m$, mais il utilise $n$. Le code plante dès que $m \neq n$. | 6 (blocs inversibles et forme canonique) |
 
+## 4. `rademacher_sum_moments` : ChatGPT échoue à 6/16
+
+**Le problème.** $S = \sum_i c_i \varepsilon_i$, avec des $c_i$ entiers et des signes aléatoires $\varepsilon_i = \pm 1$ indépendants. Il faut calculer exactement la loi de $S$, ses moments pairs $E[S^{2m}]$ (jusqu'à $10^5$ coefficients et $m = 20$), la queue $P(\lvert S\rvert > t)$ et le rapport de Khintchine $\lVert S\rVert_p / \lVert S\rVert_2$.
+
+| Erreur de ChatGPT | Tests échoués |
+|---|---|
+| **Récurrence moments–cumulants fausse** : il ne somme que sur les cumulants d'ordre impair. Or $S$ est symétrique, donc tous ses cumulants impairs sont nuls. Il renvoie $0$ pour tous les moments pairs, et un rapport de $0$ pour $p = 2$ et $p = 4$. | 6 |
+| **Conversion en `float`** de $E[S^{40}] \approx 9\times10^{353}$ : `OverflowError`. Cette erreur reste même une fois la récurrence corrigée. | 1 (inclus ci-dessus) |
+
 Toutes ces erreurs portent sur des régimes **écrits dans `problem.md`**. Les échecs viennent donc de vraies erreurs, pas d'une ambiguïté de l'énoncé.
